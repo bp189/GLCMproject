@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='sheet.css') }}">
+    <title>bharath</title>
+</head>
+<body>
+<form method="POST">
+    <label for="distance">Distance:</label>
+<select name="distance" id="distance">
+  <option value=1>1</option>
+  <option value=2>2</option>
+  <option value=3>3</option>
+  <option value=4>4</option>
+</select>
+    <label for="distance">Angle:</label>
+    <select name="angle" id="angle">
+  <option value=0>0</option>
+  <option value=45>45</option>
+  <option value=90>90</option>
+  <option value=135>135</option>
+</select>
+    <input type="submit">
+</form>
+<!-- Tab content -->
+<div id="London" class="tabcontent">
+ <table border="1" id="table2">
+ <h4>Distance: {{Distance  }}</h4>
+ <h4>Angle: {{ Angle }}</h4>
+  <caption>Delivery slots:</caption>
+  <tr>
+    <td></td>
+        {%- for index in range(1 ,Matrix1[0].size + 1)  %}
+     <th scope="col">{{ index }}</th>
+  {%- endfor %}
+  </tr>
+              {% for row in Matrix1 %}
+        <tr>
+         <th scope="row">{{ loop.index }}</th>
+        {% for cell in row %}
+          <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+</table>
+    <br/>
+    <table border="1" id="table1">
+  <caption>GlcmMatrix slots:</caption>
+  <tr>
+    <td></td>
+        {%- for index in range(0 ,GlcmMatrix[0].size)  %}
+     <th scope="col">{{ index }}</th>
+  {%- endfor %}
+  </tr>
+   {% for row in GlcmMatrix %}
+        <tr>
+         <th scope="row">{{ loop.index - 1 }}</th>
+        {% for cell in row %}
+          <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+  </tr>
+
+</table>
+</div>
+</body>
+<script>
+
+  // Get all elements with class="tabcontent" and hide them
+
+  const tbody = document.querySelector('#table1 tbody');
+tbody.addEventListener('click', function (e) {
+  const cell = e.target.closest('td');
+  if (!cell) {return;} // Quit, not clicked on a cell
+  const row = cell.parentElement;
+});
+
+    var table = document.getElementById('table1');
+    var cells = table.getElementsByTagName('td');
+    for (var i = 0; i < cells.length; i++) {
+        var cell = cells[i];
+        cell.onclick = function (e) {
+            highlight_other('table1',this,Math.floor(Math.random()*16777215).toString(16));
+            }
+    }
+
+
+function highlight_other(tableName,element,randomColor) {
+    var othertable = "table2";
+    var distance={{ Distance }}
+    var angle={{ Angle }}
+    var col=(event.target.cellIndex-1).toString();
+    var row=(event.target.parentNode.rowIndex-1).toString();
+    var table2 = document.getElementById(othertable);
+    var cells2 = table2.getElementsByTagName('td');
+    if(angle===45){
+         for (var i2 = 0; i2 < cells2.length; i2++){
+             var cell2 = cells2[i2];
+             if(cell2.innerHTML === row) {
+                 var i3=i2-(distance)*3;
+                 console.log(i2,i3)
+                 if(i3>0 && cells2[i3].innerHTML === col){
+                     element.style.backgroundColor="#" + randomColor;
+                     cell2.style.backgroundColor="#" + randomColor;
+                     console.log(event.target.parentNode.rowIndex,event.target.cellIndex)
+                     var d=1;
+                     while(d<=distance){
+                         var cellid=i2-(d)*3;
+                         cells2[cellid].style.backgroundColor = "#" + randomColor;
+                         d++;
+                     }
+                 }
+             }
+         }
+    }
+    if(angle===0) {
+        for (var i2 = 0; i2 < cells2.length; i2++) {
+            var cell2 = cells2[i2];
+            var colIndex = i2 - distance;
+            if (cell2.innerHTML === row) {
+                console.log(cell2.innerHTML,row);
+                if ((i2 - distance)>0&&cells2[i2 - distance].innerHTML === col) {
+                    element.style.backgroundColor = "#" + randomColor;
+                    cell2.style.backgroundColor = "#" + randomColor;
+                    console.log(event.target.parentNode.rowIndex, event.target.cellIndex);
+                    while (colIndex < i2) {
+                        cells2[colIndex].style.backgroundColor = "#" + randomColor;
+                        colIndex++;
+                    }
+                }
+            }
+        }
+    }
+    if(angle===135){
+        var tableRows=document.getElementById("table2").rows;
+        for (var itr = 0; itr < tableRows.length; itr++) {
+            var cellArr=tableRows[itr].cells
+            for(var j=distance;j<cellArr.length;j++){
+                var rowCell=cellArr[j];
+                if(rowCell.innerHTML === row && itr>distance){
+                    console.log(itr,j);
+                    var newCell=tableRows[itr-distance].cells[j-distance];
+                    if(newCell.innerHTML ===col && (j-distance)>0){
+                        newCell.style.backgroundColor = "#" + randomColor;
+                        rowCell.style.backgroundColor = "#" + randomColor;
+                        var dist=distance;
+                        while(dist>1){
+                            itrCell=tableRows[itr+dist].cells[j+dist];
+                            itrCell.style.backgroundColor = "#" + randomColor;
+                            console.log(newCell,itr,j,col)
+                            dist--;
+                        }
+                    }
+
+
+                }
+            }
+        }
+    }
+    if(angle===90){
+        var tableRows=document.getElementById("table2").rows;
+        for (var itr = distance+1; itr < tableRows.length; itr++) {
+            var cellArr=tableRows[itr].cells
+            for(var j=1;j<cellArr.length;j++){
+                var rowCell=cellArr[j];
+                if(rowCell.innerHTML === row){
+                    console.log(itr,j);
+                    var newCell=tableRows[itr-distance].cells[j];
+                    if(newCell.innerHTML ===col && j>0){
+                        newCell.style.backgroundColor = "#" + randomColor;
+                        rowCell.style.backgroundColor = "#" + randomColor;
+                        var dist=1;
+                        while(dist<distance){
+                            itrCell=tableRows[itr-dist].cells[j];
+                            itrCell.style.backgroundColor = "#" + randomColor;
+                            console.log(newCell,itr,j,col)
+                            dist++;
+                        }
+                    }
+
+
+                }
+            }
+        }
+    }
+
+}
+
+</script>
+</html>
